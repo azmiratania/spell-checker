@@ -53,3 +53,14 @@ test("test_closest_words_basic", () => {
     expect(results[0][1]).toBe(1);
     expect(results[0][2]).toBe(500);
 });
+
+test("test_closest_words_frequency_order", () => {
+    const ed = new EditDistance();
+
+    const results = ed.closestWords(
+        "rat",
+        new Map([["bat", 200], ["hat", 300], ["mat", 50], ["cat", 100]]),
+        1
+    );
+    expect(results[0][0]).toBe("hat");
+});
