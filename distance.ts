@@ -57,10 +57,10 @@ export class EditDistance {
                 results.push([candidate, dist, freq]);  // Store the candidate with its distance and frequency
             }
         }
-        // Sort results: primarily by edit distance (ascending), then by frequency (ascending)
+        // Sort results: primarily by edit distance (ascending), then by frequency (descending)
         results.sort((a, b) => {
             if (a[1] !== b[1]) return a[1] - b[1]; // Sort by distance first
-            return a[2] - b[2];                     // Break ties by frequency (lower freq first)
+            return b[2] - a[2];                     // Break ties by frequency (higher freq first)
         });
         return results; // Return the sorted list of close matches
     }
