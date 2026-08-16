@@ -55,11 +55,11 @@ export class EditDistance {
         }
 
         // Allocate only necessary columns: we only need current and previous row
-        const prev: number[] = [];
-        const curr: number[] = [];
+        let prev: number[] = new Array(n + 1).fill(0);
+        let curr: number[] = new Array(n + 1).fill(0);
         
         for (let j = 0; j <= n; j++) {
-            prev.push(j);
+            prev[j] = j;
         }
 
         for (let i = 1; i <= m; i++) {
@@ -85,7 +85,7 @@ export class EditDistance {
             }
 
             // Swap rows
-            [prev, curr].reverse();
+            [prev, curr] = [curr, prev];
         }
 
         const result = prev[n];
