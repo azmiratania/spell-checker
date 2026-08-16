@@ -44,6 +44,54 @@ export class EditDistance {
         return dp[m][n]; // The bottom-right cell holds the final edit distance
     }
 
+    // Bounded edit distance: stops early if distance exceeds maxDistance
+    computeBounded(source: string, target: string, maxDistance: number): number {
+        const m = source.length;
+        const n = target.length;
+
+        // Length difference is a lower bound on edit distance
+        if (Math.abs(m - n) > maxDistance) {
+            return maxDistance + 1; // Exceeds bound, return sentinel value
+        }
+
+        // Allocate only necessary columns: we only need current and previous row
+        const prev: number[] = [];
+        const curr: number[] = [];
+        
+        for (let j = 0; j <= n; j++) {
+            prev.push(j);
+        }
+
+        for (let i = 1; i <= m; i++) {
+            curr[0] = i;
+            
+            for (let j = 1; j <= n; j++) {
+                let substitute: number;
+                if (source[i - 1] === target[j - 1]) {
+                    substitute = prev[j - 1];
+                } else {
+                    substitute = prev[j - 1] + 1;
+                }
+
+                const insert = curr[j - 1] + 1;
+                const del = prev[j] + 1;
+
+                curr[j] = Math.min(insert, del, substitute);
+            }
+
+            // Early termination: if all values in curr row exceed maxDistance, we can stop
+            if (curr.every(val => val > maxDistance)) {
+                return maxDistance + 1;
+            }
+
+            // Swap rows
+            [prev, curr].reverse();
+        }
+
+        const result = prev[n];
+        return result > maxDistance ? maxDistance + 1 : result;
+    }
+
     // Method that finds all candidate words within a given edit distance of the input word
     closestWords(
         word: string,                        // The misspelled or query word
@@ -52,7 +100,7 @@ export class EditDistance {
     ): [string, number, number][] {          // Returns array of [word, distance, frequency] tuples
         const results: [string, number, number][] = []; // Accumulator for matching candidates
         for (const [candidate, freq] of candidates) {   // Iterate over each dictionary entry
-            const dist = this.compute(word, candidate); // Compute edit distance to this candidate
+            const dist = this.computeBounded(word, candidate, maxDistance); // Use bounded computation
             if (dist <= maxDistance) {                  // Only keep candidates within max distance
                 results.push([candidate, dist, freq]);  // Store the candidate with its distance and frequency
             }
