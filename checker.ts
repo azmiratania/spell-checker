@@ -12,6 +12,11 @@ export class Checker {
     }
 
     suggest(word: string, maxDistance: number = 2, maxSuggestions: number = 5): string[] {
-        return [];
+        // Use the EditDistance helper to find candidate words within maxDistance.
+        // closestWords already returns tuples of [word, distance, frequency]
+        // sorted by distance (ascending) then frequency (descending).
+        const candidates = this.ed.closestWords(word, this.dictionary, maxDistance);
+        // Take up to maxSuggestions and return only the words.
+        return candidates.slice(0, maxSuggestions).map(([w]) => w);
     }
 }
